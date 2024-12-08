@@ -1,0 +1,42 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: prometheus-community
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://prometheus-community.github.io/helm-charts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+  namespace: monitoring
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      version: "55.5.0"
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+  install:
+    createNamespace: true
+  values:
+    grafana:
+      enabled: true
+      adminPassword: prom-operator
+      ingress:
+        enabled: false # Enable if you need ingress
+    prometheus:
+      prometheusSpec:
+        retention: 30d
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200Mi
+    alertmanager:
+      alertmanagerSpec:
+        retention: 120h
