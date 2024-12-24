@@ -22,7 +22,16 @@ spec:
         kind: HelmRepository
         name: crossplane-stable
         namespace: flux-system
+  values:
+    args:
+      - --enable-ssa-claims
+    metrics:
+      enabled: true
+      port: 8080
+      serviceMonitor:
+        enabled: true      
   install:
     crds: Create
   upgrade:
     crds: CreateReplace
+  
